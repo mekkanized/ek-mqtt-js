@@ -14,8 +14,11 @@ import streamBuilder from "mqtt/lib/connect/ws";
  */
 function wrap(opts, stream_builder) {
   return function wrapper(client) {
-    console.log(`${typeof(stream_builder)}`)
-    return stream_builder(client, opts);
+    if(typeof(stream_builder) === 'object'){
+      return stream_builder.default(client, opts);
+    } else {
+      return stream_builder(client, opts);
+    }
   }
 }
 
@@ -31,7 +34,6 @@ export function Connect(id, key, hostname, port) {
   const opts = {protocolVersion: 5, protocol: "ws", clientId: id, host: hostname, port: port, manualConnect: true};
   const client = new mqtt.Client(wrap(opts, streamBuilder), opts);
   client.handleAuth = (packet, _) => {
-    console.log(`KEY_LENGTH: ${key.length}`);
     let digest = new Uint8Array(packet.properties.authenticationData);
     let signature = ed.sign(digest, key);
     let resp = {
