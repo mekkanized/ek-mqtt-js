@@ -1,5 +1,6 @@
 import mqtt from "mqtt";
 import * as ed from "@noble/ed25519";
+import { Buffer } from "buffer";
 
 import {sha512} from "@noble/hashes/sha512";
 ed.etc.sha512Sync = (...m) => sha512(ed.etc.concatBytes(...m));
@@ -40,8 +41,8 @@ export function Connect(id, key, hostname, port) {
       cmd: 'auth',
       reasonCode: 0,
       properties: {
-         authenticationMethod: 'ek-signature',
-         authenticationData: signature,
+         authenticationMethod: "ek-signature",
+         authenticationData: Buffer.from(signature),
       }
     }
     client._writePacket(resp);
